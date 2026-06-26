@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Activité glisser-déposer – Lettre de motivation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f3f4f6;
+      color: #1f2933;
+      min-height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+      padding: 20px 0;
+    }
+
+    .app {
+      width: 96vw;
+      max-width: 1300px;
+      min-height: 92vh;
+      background: #ffffff;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+      border-radius: 14px;
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+
+    .app-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .app-subtitle {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    /* BOUTONS PREMIUM */
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #111827;
+      border: 1px solid #e5e7eb;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    /* BARRE DE STATUT */
+    .status-bar {
+      margin-top: 6px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+
+    .status-bar span.ok {
+      color: #15803d;
+      font-weight: 600;
+    }
+
+    .status-bar span.error {
+      color: #b91c1c;
+      font-weight: 600;
+    }
+
+    /* COLONNES */
+    .app-main {
+      flex: 1;
+      display: flex;
+      gap: 18px;
+      margin-top: 4px;
+    }
+
+    .column {
+      border-radius: 10px;
+      padding: 12px;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .column-left {
+      width: 30%;
+      border: 1px solid #e5e7eb;
+    }
+
+    .column-right {
+      flex: 1;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+    }
+
+    .column-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .column-description {
+      font-size: 0.78rem;
+      color: #6b7280;
+      margin-bottom: 10px;
+    }
+
+    /* DRAGGABLES */
+    .draggables {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      overflow-y: auto;
+      max-height: 75vh;
+      padding-right: 6px;
+    }
+
+    .draggable {
+      font-size: 0.8rem;
+      padding: 6px 8px;
+      border-radius: 999px;
+      border: 1px solid #b91c1c;
+      background: #fee2e2;
+      color: #7f1d1d;
+      cursor: grab;
+      text-align: center;
+      user-select: none;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .draggable:active {
+      cursor: grabbing;
+      transform: scale(1.02);
+      box-shadow: 0 6px 14px rgba(185, 28, 28, 0.25);
+    }
+
+    /* LETTRE TYPE */
+    .letter-wrapper {
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, #f9fafb 0%, #ffffff 40%, #f9fafb 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.8rem;
+    }
+
+    .letter-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 40px;
+    }
+
+    .label {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+
+    .letter-paragraph {
+      margin-top: 4px;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .letter-footer {
+      margin-top: 6px;
+    }
+
+    .dropzone {
+      min-height: 22px;
+      border-radius: 999px;
+      border: 1px dashed #d1d5db;
+      padding: 3px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      color: #9ca3af;
+      background: #f9fafb;
+      transition: 0.15s ease;
+    }
+
+    .dropzone.large { width: 100%; }
+    .dropzone.medium { min-width: 200px; }
+    .dropzone.small { min-width: 140px; }
+
+    .dropzone.highlight {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.35);
+    }
+
+    .dropzone.correct {
+      border-color: #16a34a;
+      background: #ecfdf3;
+    }
+
+    .dropzone.incorrect {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    /* MODALE */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 10px;
+      max-width: 520px;
+      width: 90%;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
+      padding: 16px 18px 14px;
+      font-size: 0.85rem;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .modal-title {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .close-icon {
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #6b7280;
+    }
+
+    .modal-body p {
+      margin-bottom: 4px;
+    }
+
+    .modal-body ul {
+      margin-left: 18px;
+      margin-top: 4px;
+    }
+
+    .modal-body li {
+      margin-bottom: 3px;
+    }
+
+    .modal-footer {
+      margin-top: 10px;
+      text-align: right;
+    }
+
+    /* PAGE D'INTRODUCTION */
+    .intro-screen {
+      position: fixed;
+      inset: 0;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .intro-card {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+      padding: 36px 40px;
+      max-width: 520px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .intro-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .intro-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+
+    .intro-description {
+      font-size: 0.85rem;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .intro-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .intro-field {
+      text-align: left;
+    }
+
+    .intro-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+
+    .intro-field input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      font-size: 0.85rem;
+      color: #111827;
+      background: #f9fafb;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      font-family: inherit;
+    }
+
+    .intro-field input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      background: #ffffff;
+    }
+
+    .intro-field input::placeholder {
+      color: #9ca3af;
+    }
+
+    .intro-actions {
+      display: flex;
+      justify-content: center;
+    }
+
+    .intro-error {
+      font-size: 0.8rem;
+      color: #b91c1c;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- PAGE D'INTRODUCTION -->
+  <div class="intro-screen" id="intro-screen">
+    <div class="intro-card">
+      <div class="intro-icon">✉</div>
+      <h1 class="intro-title">Activité Lettre de motivation – éléments importants</h1>
+      <p class="intro-description">Avant de commencer, veuillez renseigner vos informations. Elles figureront sur le document PDF généré à l'issue de l'activité.</p>
+
+      <div class="intro-form">
+        <div class="intro-field">
+          <label for="intro-nom">Nom</label>
+          <input type="text" id="intro-nom" placeholder="Votre nom" autocomplete="family-name" />
+        </div>
+        <div class="intro-field">
+          <label for="intro-prenom">Prénom</label>
+          <input type="text" id="intro-prenom" placeholder="Votre prénom" autocomplete="given-name" />
+        </div>
+        <div class="intro-field">
+          <label for="intro-formation">Formation</label>
+          <input type="text" id="intro-formation" placeholder="Votre formation" autocomplete="organization-title" />
+        </div>
+      </div>
+
+      <div class="intro-error" id="intro-error">Veuillez remplir tous les champs avant de continuer.</div>
+
+      <div class="intro-actions">
+        <button class="btn-primary" id="btn-start" type="button">Commencer l'activité</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app" id="activity-root">
+
+    <header class="app-header">
+      <div>
+        <div class="app-title">Lettre de motivation – Activité de glisser-déposer</div>
+        <div class="app-subtitle">Reconstituez la structure complète d'une lettre de motivation professionnelle.</div>
+      </div>
+
+      <div class="header-buttons">
+        <button class="btn-outline" id="btn-consigne" type="button">Consigne</button>
+        <button class="btn-secondary" id="btn-reset" type="button">Réinitialiser</button>
+        <button class="btn-secondary" id="btn-pdf" type="button">PDF</button>
+        <button class="btn-primary" id="btn-check" type="button">Vérifier</button>
+      </div>
+    </header>
+
+    <div class="status-bar">
+      <span id="status-text">Glissez-déposez tous les éléments, puis cliquez sur Vérifier.</span>
+    </div>
+
+    <main class="app-main">
+
+      <!-- COLONNE GAUCHE -->
+      <section class="column column-left">
+        <div class="column-title">Éléments à placer</div>
+        <div class="column-description">
+          Faites glisser chaque élément rouge vers la zone correspondante.
+        </div>
+
+        <div class="draggables" id="draggables-container">
+          <div class="draggable" draggable="true" data-id="adresse-entreprise">Adresse</div>
+          <div class="draggable" draggable="true" data-id="paragraphe-vous-1">Montrer que l'on connaît l'entreprise : secteur, projets, valeurs, besoins.</div>
+          <div class="draggable" draggable="true" data-id="nom-prenom-candidat">Nom Prénom</div>
+          <div class="draggable" draggable="true" data-id="fonction-recruteur">Fonction dans l'entreprise</div>
+          <div class="draggable" draggable="true" data-id="paragraphe-moi-1">Présenter brièvement parcours, expériences, compétences en lien direct.</div>
+          <div class="draggable" draggable="true" data-id="cp-ville-entreprise">CP - Ville</div>
+          <div class="draggable" draggable="true" data-id="paragraphe-nous-1">Se projeter dans la collaboration : ce que vous apportez à l'équipe.</div>
+          <div class="draggable" draggable="true" data-id="mail-candidat">Mail professionnel</div>
+          <div class="draggable" draggable="true" data-id="paragraphe-vous-2">Expliquer pourquoi cet employeur vous intéresse, sans généralités.</div>
+          <div class="draggable" draggable="true" data-id="nom-entreprise">Nom de l'entreprise</div>
+          <div class="draggable" draggable="true" data-id="paragraphe-moi-2">Illustrer par 1 ou 2 exemples concrets et résultats obtenus.</div>
+          <div class="draggable" draggable="true" data-id="tel-candidat">Téléphone</div>
+          <div class="draggable" draggable="true" data-id="a-lattention">À l'attention de</div>
+          <div class="draggable" draggable="true" data-id="paragraphe-nous-2">Terminer par une ouverture vers un entretien.</div>
+          <div class="draggable" draggable="true" data-id="adresse-candidat">Adresse précise</div>
+          <div class="draggable" draggable="true" data-id="objet">Objet : Objectif de la candidature</div>
+          <div class="draggable" draggable="true" data-id="cp-ville-candidat">CP - Ville</div>
+          <div class="draggable" draggable="true" data-id="lieu-date">Lieu, Date de rédaction</div>
+          <div class="draggable" draggable="true" data-id="formule-fin">Utiliser une formule de politesse courte et professionnelle.</div>
+          <div class="draggable" draggable="true" data-id="nom-prenom-recruteur">Nom Prénom du recruteur</div>
+          <div class="draggable" draggable="true" data-id="signature">Nom Prénom + signature</div>
+        </div>
+      </section>
+
+      <!-- COLONNE DROITE -->
+      <section class="column column-right">
+        <div class="column-title">Lettre de motivation type</div>
+        <div class="column-description">
+          Respectez la mise en page : en-tête, destinataire, objet, paragraphes et conclusion.
+        </div>
+
+        <div class="letter-wrapper" id="letter-area">
+
+          <!-- EN-TÊTE -->
+          <div class="letter-row">
+            <!-- CANDIDAT -->
+            <div style="flex: 1;">
+              <div class="letter-block"><div class="dropzone medium" data-accept="nom-prenom-candidat"></div></div>
+              <div class="letter-block"><div class="dropzone medium" data-accept="adresse-candidat"></div></div>
+              <div class="letter-block"><div class="dropzone medium" data-accept="cp-ville-candidat"></div></div>
+              <div class="letter-block"><div class="dropzone medium" data-accept="mail-candidat"></div></div>
+              <div class="letter-block"><div class="dropzone medium" data-accept="tel-candidat"></div></div>
+            </div>
+
+            <!-- ENTREPRISE -->
+            <div style="flex: 1; text-align: right;">
+              <div class="letter-block"><div class="dropzone medium" data-accept="nom-entreprise"></div></div>
+              <div class="letter-block"><div class="dropzone medium" data-accept="a-lattention"></div></div>
+              <div class="letter-block"><div class="dropzone medium" data-accept="nom-prenom-recruteur"></div></div>
+              <div class="letter-block"><div class="dropzone medium" data-accept="fonction-recruteur"></div></div>
+              <div class="letter-block"><div class="dropzone medium" data-accept="adresse-entreprise"></div></div>
+              <div class="letter-block"><div class="dropzone medium" data-accept="cp-ville-entreprise"></div></div>
+
+              <div class="letter-block" style="margin-top: 10px;">
+                <div class="dropzone small" data-accept="lieu-date"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- OBJET -->
+          <div class="letter-block" style="margin-top: 10px;">
+            <div class="label">Objet</div>
+            <div class="dropzone large" data-accept="objet"></div>
+          </div>
+
+          <!-- APPEL -->
+          <div class="letter-block" style="margin-top: 6px;">
+            Madame, Monsieur,
+          </div>
+
+          <!-- PARAGRAPHE 1 -->
+          <div class="letter-paragraph">
+            <div class="label">Paragraphe 1 — Vous</div>
+            <div class="dropzone large" data-accept="paragraphe-vous-1"></div>
+            <div class="dropzone large" data-accept="paragraphe-vous-2"></div>
+          </div>
+
+          <!-- PARAGRAPHE 2 -->
+          <div class="letter-paragraph">
+            <div class="label">Paragraphe 2 — Moi</div>
+            <div class="dropzone large" data-accept="paragraphe-moi-1"></div>
+            <div class="dropzone large" data-accept="paragraphe-moi-2"></div>
+          </div>
+
+          <!-- PARAGRAPHE 3 -->
+          <div class="letter-paragraph">
+            <div class="label">Paragraphe 3 — Nous</div>
+            <div class="dropzone large" data-accept="paragraphe-nous-1"></div>
+            <div class="dropzone large" data-accept="paragraphe-nous-2"></div>
+          </div>
+
+          <!-- CONCLUSION -->
+          <div class="letter-footer">
+            <div class="label">Conclusion</div>
+            <div class="dropzone medium" data-accept="formule-fin"></div>
+            <div class="dropzone medium" style="margin-top: 10px;" data-accept="signature"></div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODALE CONSIGNE -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Consigne de l'activité</div>
+        <div class="close-icon" id="modal-close">&times;</div>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Dans cette activité, vous devez reconstituer la structure complète d'une lettre de motivation professionnelle en plaçant chaque élément au bon endroit.
+        </p>
+
+        <p style="margin-top: 8px;">
+          Pour réussir l'exercice :
+        </p>
+
+        <ul style="margin-top: 6px; line-height: 1.45;">
+          <li>Faites glisser chaque élément rouge vers la zone correspondante dans la lettre.</li>
+          <li>Respectez la logique de mise en page : en‑tête, destinataire, objet, paragraphes « Vous / Moi / Nous », conclusion.</li>
+          <li>Utilisez le bouton <strong>Vérifier</strong> pour connaître votre score.</li>
+          <li>Le bouton <strong>Réinitialiser</strong> permet de recommencer l'activité.</li>
+          <li>Le bouton <strong>PDF</strong> vous permet d'enregistrer votre lettre finalisée au format A4.</li>
+        </ul>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="modal-ok" type="button">J'ai compris</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Librairies PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    (function () {
+      const draggablesContainer = document.getElementById("draggables-container");
+      const draggables = Array.from(document.querySelectorAll(".draggable"));
+      const dropzones = Array.from(document.querySelectorAll(".dropzone"));
+      const statusText = document.getElementById("status-text");
+
+      const btnCheck = document.getElementById("btn-check");
+      const btnReset = document.getElementById("btn-reset");
+      const btnConsigne = document.getElementById("btn-consigne");
+      const btnPdf = document.getElementById("btn-pdf");
+
+      const modalBackdrop = document.getElementById("modal-backdrop");
+      const modalClose = document.getElementById("modal-close");
+      const modalOk = document.getElementById("modal-ok");
+
+      let draggedId = null;
+
+      /* PAGE D'INTRODUCTION */
+      const introScreen = document.getElementById("intro-screen");
+      const btnStart = document.getElementById("btn-start");
+      const introNom = document.getElementById("intro-nom");
+      const introPrenom = document.getElementById("intro-prenom");
+      const introFormation = document.getElementById("intro-formation");
+      const introError = document.getElementById("intro-error");
+
+      let studentNom = "";
+      let studentPrenom = "";
+      let studentFormation = "";
+
+      btnStart.addEventListener("click", function () {
+        studentNom = introNom.value.trim();
+        studentPrenom = introPrenom.value.trim();
+        studentFormation = introFormation.value.trim();
+
+        if (!studentNom || !studentPrenom || !studentFormation) {
+          introError.style.display = "block";
+          return;
+        }
+
+        introScreen.style.display = "none";
+      });
+
+      /* FIN PAGE D'INTRODUCTION */
+
+      function resetActivity() {
+        dropzones.forEach((dz) => {
+          const child = dz.querySelector(".draggable");
+          if (child) {
+            draggablesContainer.appendChild(child);
+            child.classList.remove("placed");
+          }
+          dz.classList.remove("filled", "correct", "incorrect", "highlight");
+        });
+
+        statusText.textContent = "Glissez-déposez tous les éléments, puis cliquez sur Vérifier.";
+        statusText.classList.remove("ok", "error");
+      }
+
+      draggables.forEach((drag) => {
+        drag.addEventListener("dragstart", (e) => {
+          draggedId = drag.getAttribute("data-id");
+          e.dataTransfer.setData("text/plain", draggedId);
+        });
+      });
+
+      dropzones.forEach((dz) => {
+        dz.addEventListener("dragenter", (e) => {
+          e.preventDefault();
+          dz.classList.add("highlight");
+        });
+
+        dz.addEventListener("dragover", (e) => {
+          e.preventDefault();
+        });
+
+        dz.addEventListener("dragleave", () => {
+          dz.classList.remove("highlight");
+        });
+
+        dz.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dz.classList.remove("highlight");
+
+          const id = e.dataTransfer.getData("text/plain") || draggedId;
+          if (!id) return;
+
+          const draggedEl = draggables.find(
+            (d) => d.getAttribute("data-id") === id
+          );
+          if (!draggedEl) return;
+
+          const existing = dz.querySelector(".draggable");
+          if (existing) {
+            draggablesContainer.appendChild(existing);
+            existing.classList.remove("placed");
+          }
+
+          dz.textContent = "";
+          dz.appendChild(draggedEl);
+          draggedEl.classList.add("placed");
+          dz.classList.add("filled");
+        });
+      });
+
+      btnCheck.addEventListener("click", () => {
+        let correctCount = 0;
+        const total = dropzones.length;
+
+        dropzones.forEach((dz) => {
+          const expected = dz.getAttribute("data-accept");
+          const child = dz.querySelector(".draggable");
+
+          if (child && child.getAttribute("data-id") === expected) {
+            dz.classList.add("correct");
+            dz.classList.remove("incorrect");
+            correctCount++;
+          } else {
+            dz.classList.add("incorrect");
+            dz.classList.remove("correct");
+          }
+        });
+
+        if (correctCount === total) {
+          statusText.textContent = "Parfait : tous les éléments sont correctement placés.";
+          statusText.classList.add("ok");
+          statusText.classList.remove("error");
+        } else {
+          statusText.textContent =
+            "Résultat : " + correctCount + " / " + total + " éléments bien placés. Corrigez les zones en rouge.";
+          statusText.classList.add("error");
+          statusText.classList.remove("ok");
+        }
+      });
+
+      btnConsigne.addEventListener("click", () => {
+        modalBackdrop.style.display = "flex";
+      });
+
+      function closeModal() {
+        modalBackdrop.style.display = "none";
+      }
+
+      modalClose.addEventListener("click", closeModal);
+      modalOk.addEventListener("click", closeModal);
+
+      modalBackdrop.addEventListener("click", (e) => {
+        if (e.target === modalBackdrop) closeModal();
+      });
+
+      btnReset.addEventListener("click", resetActivity);
+
+      /* EXPORT PDF (A4, UNE SEULE PAGE, CLONE INVISIBLE) */
+      btnPdf.addEventListener("click", async () => {
+        const letterArea = document.getElementById("letter-area");
+
+        statusText.textContent = "Génération du PDF…";
+        statusText.classList.remove("ok", "error");
+
+        try {
+          /* MODIFICATION PDF : en-tête étudiant + date */
+          var wrapper = document.createElement("div");
+          wrapper.style.position = "absolute";
+          wrapper.style.top = "-9999px";
+          wrapper.style.left = "-9999px";
+          wrapper.style.width = letterArea.offsetWidth + "px";
+          wrapper.style.background = "#ffffff";
+          wrapper.style.padding = "20px";
+          wrapper.style.fontFamily = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+          var pdfHeader = document.createElement("div");
+          pdfHeader.style.borderBottom = "2px solid #111827";
+          pdfHeader.style.paddingBottom = "10px";
+          pdfHeader.style.marginBottom = "16px";
+          pdfHeader.style.display = "flex";
+          pdfHeader.style.justifyContent = "space-between";
+          pdfHeader.style.fontSize = "0.85rem";
+          pdfHeader.style.color = "#374151";
+          pdfHeader.style.lineHeight = "1.5";
+
+          var headerLeft = document.createElement("div");
+          headerLeft.innerHTML = "<strong>" + studentPrenom + " " + studentNom + "</strong><br/>Formation : " + studentFormation;
+
+          var headerRight = document.createElement("div");
+          headerRight.style.textAlign = "right";
+          var now = new Date();
+          headerRight.textContent = now.toLocaleDateString("fr-FR", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+          });
+
+          pdfHeader.appendChild(headerLeft);
+          pdfHeader.appendChild(headerRight);
+          wrapper.appendChild(pdfHeader);
+
+          var clone = letterArea.cloneNode(true);
+          clone.style.position = "static";
+          clone.style.width = "auto";
+          wrapper.appendChild(clone);
+
+          document.body.appendChild(wrapper);
+
+          var canvas = await html2canvas(wrapper, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            scrollX: 0,
+            scrollY: 0
+          });
+
+          document.body.removeChild(wrapper);
+          /* FIN MODIFICATION PDF */
+
+          const imgData = canvas.toDataURL("image/png");
+          const { jsPDF } = window.jspdf;
+
+          const pdf = new jsPDF("p", "mm", "a4");
+
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+
+          let imgWidth = pageWidth - 20;
+          let imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+          if (imgHeight > pageHeight - 20) {
+            const ratio = (pageHeight - 20) / imgHeight;
+            imgHeight = imgHeight * ratio;
+            imgWidth = imgWidth * ratio;
+          }
+
+          pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+          pdf.save("lettre_motivation_structure.pdf");
+
+          statusText.textContent = "PDF téléchargé.";
+          statusText.classList.add("ok");
+
+        } catch (err) {
+          console.error(err);
+          statusText.textContent = "Erreur lors de la génération du PDF.";
+          statusText.classList.add("error");
+        }
+      });
+
+      // Initialisation
+      resetActivity();
+    })();
+  </script>
+</body>
+</html>
